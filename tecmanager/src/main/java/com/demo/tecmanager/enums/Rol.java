@@ -1,5 +1,9 @@
 package com.demo.tecmanager.enums;
 
-public class Rol {
+public enum Rol {
+
+    ADMIN,
+    ASIGNADOR,
+    TECNICO
 
 }

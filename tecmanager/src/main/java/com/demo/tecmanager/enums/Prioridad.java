@@ -1,5 +1,9 @@
 package com.demo.tecmanager.enums;
 
-public class Prioridad {
+public enum Prioridad {
+
+    BAJA,
+    MEDIA,
+    ALTA
 
 }
