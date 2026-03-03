@@ -99,75 +99,91 @@ public class TareaService {
         return toResponse(buscarPorIdOFallar(id));
     }
 
-    public TareaResponse editar(String id, TareaRequest request, String usuarioId) {
-        Tarea tarea = buscarPorIdOFallar(id);
-        String tituloAnterior = tarea.getTitulo();
+    public TareaResponse editar(String tareaId, TareaRequest request, String emailUsuario) {
+    Tarea tarea = buscarPorIdOFallar(tareaId);
 
-        tarea.setTitulo(request.getTitulo());
-        tarea.setDescripcion(request.getDescripcion());
-        tarea.setPrioridad(request.getPrioridad());
-        tarea.setFechaLimite(request.getFechaLimite());
-        tarea.setTiempoEstimadoHoras(request.getTiempoEstimadoHoras());
+    Usuario usuario = usuarioRepository.findByEmail(emailUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + emailUsuario));
 
-        Tarea actualizada = tareaRepository.save(tarea);
+    String tituloAnterior = tarea.getTitulo();
 
-        historialService.registrar(id, usuarioId, AccionHistorial.EDICION, tituloAnterior, actualizada.getTitulo());
+    tarea.setTitulo(request.getTitulo());
+    tarea.setDescripcion(request.getDescripcion());
+    tarea.setPrioridad(request.getPrioridad());
+    tarea.setFechaLimite(request.getFechaLimite());
+    tarea.setTiempoEstimadoHoras(request.getTiempoEstimadoHoras());
 
-        return toResponse(actualizada);
-    }
-
-    public TareaResponse asignarTecnico(String tareaId, String tecnicoId, String usuarioId) {
-        Tarea tarea = buscarPorIdOFallar(tareaId);
-        
-        Usuario tecnico = usuarioRepository.findById(tecnicoId).orElseThrow(() -> new ResourceNotFoundException("Tecnico no encontrado con id: " + tecnicoId));
-
+    if (request.getTecnicoId() != null && !request.getTecnicoId().isBlank()) {
+        Usuario tecnico = usuarioRepository.findById(request.getTecnicoId()).orElseThrow(() -> new ResourceNotFoundException("Técnico no encontrado con id: " + request.getTecnicoId()));
         if (!tecnico.isActivo()) {
-            throw new IllegalArgumentException("no se puede asignar una tarea a un usuario inactivo");
+            throw new IllegalArgumentException("No se puede asignar a un usuario inactivo");
         }
-
-        String tecnicoAnterior = tarea.getTecnicoId();
-        tarea.setTecnicoId(tecnicoId);
-        Tarea actualizada = tareaRepository.save(tarea);
-
-        historialService.registrar(tareaId, usuarioId, AccionHistorial.REASIGNACION, tecnicoAnterior, tecnicoId);
-
-        notificacionService.notificar(tecnicoId, "Se te asigno la tarea: " + tarea.getTitulo());
-
-        return toResponse(actualizada);
+        tarea.setTecnicoId(request.getTecnicoId());
     }
 
-    public TareaResponse cambiarEstado(String tareaId, CambioEstadoRequest request, String tecnicoId) {
-        Tarea tarea = buscarPorIdOFallar(tareaId);
-        EstadoTarea estadoAnterior = tarea.getEstado();
-        EstadoTarea nuevoEstado = request.getNuevoEstado();
+    Tarea actualizada = tareaRepository.save(tarea);
 
-        if (nuevoEstado == EstadoTarea.EN_PROCESO && tarea.getFechaInicioProceso() == null) {
-            tarea.setFechaInicioProceso(LocalDateTime.now());
-        } 
+    historialService.registrar(tareaId, usuario.getId(), AccionHistorial.EDICION, tituloAnterior, actualizada.getTitulo());
 
-        if (nuevoEstado == EstadoTarea.FINALIZADA) {
-            tarea.setFechaFinalizacion(LocalDateTime.now());
+    return toResponse(actualizada);
+}
 
-            if (tarea.getFechaInicioProceso() != null) {
-                long horas = java.time.Duration.between(tarea.getFechaInicioProceso(), tarea.getFechaFinalizacion()).toHours();
-                tarea.setTiempoRealHoras((int) horas);
-            }
-        }
+    public TareaResponse asignarTecnico(String tareaId, String tecnicoId, String emailUsuario) {
+    Tarea tarea = buscarPorIdOFallar(tareaId);
 
-        tarea.setEstado(nuevoEstado);
-        Tarea actualizada = tareaRepository.save(tarea);
+    Usuario usuarioAutenticado = usuarioRepository.findByEmail(emailUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + emailUsuario));
 
-        Reporte reporte = new Reporte(tareaId, tecnicoId, request.getComentario(), nuevoEstado);
-        reporteRepository.save(reporte);
+    Usuario tecnico = usuarioRepository.findById(tecnicoId).orElseThrow(() -> new ResourceNotFoundException("Técnico no encontrado con id: " + tecnicoId));
 
-        historialService.registrar(tareaId, tecnicoId, AccionHistorial.CAMBIO_ESTADO, estadoAnterior.name(), nuevoEstado.name());
-
-        if (tarea.getCreadaPor() != null ) {
-            notificacionService.notificar(tarea.getCreadaPor(), "La tarea '" + tarea.getTitulo() + "' cambio de estado a: " + nuevoEstado.name());
-        }
-
-        return toResponse(actualizada);
+    if (!tecnico.isActivo()) {
+        throw new IllegalArgumentException("No se puede asignar una tarea a un usuario inactivo");
     }
+
+    String tecnicoAnterior = tarea.getTecnicoId();
+    tarea.setTecnicoId(tecnicoId);
+    Tarea actualizada = tareaRepository.save(tarea);
+
+    historialService.registrar(tareaId, usuarioAutenticado.getId(), AccionHistorial.REASIGNACION, tecnicoAnterior, tecnicoId);
+
+    notificacionService.notificar(tecnicoId, "Se te asignó la tarea: " + tarea.getTitulo());
+
+    return toResponse(actualizada);
+}
+
+    public TareaResponse cambiarEstado(String tareaId, CambioEstadoRequest request, String emailTecnico) {
+    Tarea tarea = buscarPorIdOFallar(tareaId);
+
+    Usuario tecnico = usuarioRepository.findByEmail(emailTecnico) .orElseThrow(() -> new ResourceNotFoundException( "Usuario no encontrado: " + emailTecnico));
+
+    EstadoTarea estadoAnterior = tarea.getEstado();
+    EstadoTarea nuevoEstado = request.getNuevoEstado();
+
+    if (nuevoEstado == EstadoTarea.EN_PROCESO && tarea.getFechaInicioProceso() == null) {
+        tarea.setFechaInicioProceso(LocalDateTime.now());
+    }
+
+    if (nuevoEstado == EstadoTarea.FINALIZADA) {
+        tarea.setFechaFinalizacion(LocalDateTime.now());
+
+        if (tarea.getFechaInicioProceso() != null) {
+            long horas = java.time.Duration.between(tarea.getFechaInicioProceso(), tarea.getFechaFinalizacion()).toHours();
+            tarea.setTiempoRealHoras((int) horas);
+        }
+    }
+
+    tarea.setEstado(nuevoEstado);
+    Tarea actualizada = tareaRepository.save(tarea);
+
+    Reporte reporte = new Reporte( tareaId, tecnico.getId(), request.getComentario(), nuevoEstado);
+    reporteRepository.save(reporte);
+
+    historialService.registrar(tareaId, tecnico.getId(), AccionHistorial.CAMBIO_ESTADO, estadoAnterior.name(), nuevoEstado.name());
+
+    if (tarea.getCreadaPor() != null) {
+        notificacionService.notificar(tarea.getCreadaPor(), "La tarea '" + tarea.getTitulo() + "' cambió a: " + nuevoEstado.name());
+    }
+
+    return toResponse(actualizada);
+}
 
     public void eliminar(String id) {
         if (!tareaRepository.existsById(id)) {
