@@ -1,59 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Variables ── */
+:root {
+  --navy:    #14518e;
+  --navy-dk: #0e3a68;
+  --navy-lt: #2a6aad;
+  --silver:  #bbc8d8;
+  --snow:    #eaeff3;
+  --white:   #ffffff;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Fondo cielo ── */
 .login-fondo {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  background: linear-gradient(180deg, #b8d4ec 0%, #d6eaf8 35%, #eaf3fb 65%, #f4f8fc 100%);
+  background-image:
+    linear-gradient(180deg, #b8d4ec 0%, #d6eaf8 35%, #eaf3fb 65%, #f4f8fc 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Ccircle cx='450' cy='520' r='380' fill='none' stroke='rgba(255,255,255,0.30)' stroke-width='1'/%3E%3Ccircle cx='450' cy='520' r='280' fill='none' stroke='rgba(255,255,255,0.20)' stroke-width='1'/%3E%3Ccircle cx='450' cy='520' r='180' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: cover, 900px 900px;
+  background-position: center, center bottom;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px;
+  font-family: 'Nunito Sans', sans-serif;
 }
 
+/* ── Card ── */
 .login-card {
-  background: white;
-  border-radius: 16px;
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.90);
+  border-radius: 28px;
+  padding: 48px 44px 44px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 8px 40px rgba(20, 81, 142, 0.12),
+    0 2px 8px rgba(20, 81, 142, 0.06);
+  animation: cardIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Ícono superior ── */
+.login-icon-wrap {
+  width: 56px; height: 56px;
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid rgba(20, 81, 142, 0.10);
+  box-shadow: 0 4px 14px rgba(20, 81, 142, 0.12);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy);
+  margin-bottom: 22px;
+  animation: fadeUp 0.5s 0.1s both;
+}
+
+/* ── Header ── */
 .login-header {
   text-align: center;
   margin-bottom: 32px;
-}
-
-.login-logo {
-  font-size: 48px;
-  margin-bottom: 12px;
+  animation: fadeUp 0.5s 0.15s both;
 }
 
 .login-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy-dk);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 
 .login-header p {
-  font-size: 14px;
-  color: #64748b;
+  font-size: 13.5px;
+  color: #6b87a8;
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
 }
 
+/* ── Formulario ── */
 .login-form {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 14px;
+  animation: fadeUp 0.5s 0.2s both;
 }
 
-.login-btn {
-  width: 100%;
-  justify-content: center;
-  padding: 12px;
-  font-size: 16px;
-  margin-top: 8px;
-  border-radius: 8px;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+.form-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Contenedor input ── */
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 88%;
+  margin: 0 auto;
+  background: rgba(234, 239, 243, 0.70);
+  border: 1px solid rgba(20, 81, 142, 0.13);
+  border-radius: 10px;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+}
+
+.input-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.input-icon {
+  color: #9db4cc;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 14px;
+}
+
+/* ── Input sin ningun estilo nativo ── */
+.form-grupo input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  color: var(--navy-dk);
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-grupo input:focus,
+.form-grupo input:focus-visible,
+.form-grupo input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.form-grupo input::placeholder {
+  color: #9db4cc;
+}
+
+/* ── Alerta error ── */
+.alerta-error {
+  background: rgba(20, 81, 142, 0.07);
+  border: 1px solid rgba(20, 81, 142, 0.20);
+  color: var(--navy);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ── Botón ── */
+.login-btn {
+  width: 88%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 13px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  box-shadow: 0 4px 16px rgba(20, 81, 142, 0.30);
+  letter-spacing: 0.01em;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: var(--navy-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(20, 81, 142, 0.38);
+}
+
+.login-btn:active:not(:disabled) { transform: translateY(0); }
 
 .login-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.spin {
+  animation: spinAnim 0.8s linear infinite;
+  display: inline-flex;
+  align-items: center;
+}
+
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Nota inferior ── */
+.login-nota {
+  margin-top: 20px;
+  font-size: 11.5px;
+  color: #8aaac4;
+  text-align: center;
+  letter-spacing: 0.02em;
+  animation: fadeUp 0.5s 0.3s both;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .login-card { padding: 36px 24px 32px; }
+  .input-wrap { width: 100%; }
 }

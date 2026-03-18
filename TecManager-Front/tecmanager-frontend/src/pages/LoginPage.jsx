@@ -2,16 +2,24 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import api from '../api/axiosConfig';
+import {
+  Mail,
+  Lock,
+  LogIn,
+  AlertCircle,
+  Loader2,
+  LogInIcon,
+} from 'lucide-react';
 import '../styles/login.css';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError]       = useState('');
   const [cargando, setCargando] = useState(false);
 
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +30,6 @@ export default function LoginPage() {
       const response = await api.post('/auth/login', { email, password });
       login(response.data);
 
-      // Redirigir según rol
       const rol = response.data.rol;
       if (rol === 'ADMIN' || rol === 'ASIGNADOR') {
         navigate('/dashboard');
@@ -31,7 +38,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       if (err.response?.status === 401) {
-        setError('Email o contraseña incorrectos');
+        setError('Correo o contraseña incorrectos');
       } else if (err.response?.status === 403) {
         setError('Usuario desactivado. Contacta al administrador');
       } else {
@@ -46,54 +53,85 @@ export default function LoginPage() {
     <div className="login-fondo">
       <div className="login-card">
 
-        {/* Logo / Header */}
+        {/* Ícono superior */}
+        <div className="login-icon-wrap">
+          <LogInIcon size={26} strokeWidth={2} />
+        </div>
+
+        {/* Título y descripción */}
         <div className="login-header">
-          <div className="login-logo">⚙️</div>
-          <h1>TecManager</h1>
-          <p>Sistema de Gestión de Tareas Técnicas</p>
+          <h1>Iniciar sesión</h1>
+          <p>Gestiona y da seguimiento a las tareas técnicas de tu equipo.</p>
         </div>
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="login-form">
 
           {error && (
-            <div className="alerta alerta-error">{error}</div>
+            <div className="alerta-error">
+              <AlertCircle size={15} strokeWidth={2} />
+              {error}
+            </div>
           )}
 
+          {/* Email */}
           <div className="form-grupo">
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="usuario@sistema.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-            />
+            <div className="input-wrap">
+              <span className="input-icon">
+                <Mail size={16} strokeWidth={1.8} />
+              </span>
+              <input
+                id="email"
+                type="email"
+                placeholder="Correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
           </div>
 
+          {/* Contraseña */}
           <div className="form-grupo">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="input-wrap">
+              <span className="input-icon">
+                <Lock size={16} strokeWidth={1.8} />
+              </span>
+              <input
+                id="password"
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
+          {/* Botón */}
           <button
             type="submit"
-            className="btn btn-primario login-btn"
+            className="login-btn"
             disabled={cargando}
           >
-            {cargando ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {cargando ? (
+              <>
+                <Loader2 size={17} strokeWidth={2} className="spin" />
+                Iniciando sesión...
+              </>
+            ) : (
+              <>
+                <LogIn size={17} strokeWidth={2} />
+                Ingresar al sistema
+              </>
+            )}
           </button>
 
         </form>
+
+        {/* Nota */}
+        <p className="login-nota">acceso seguro · solo personal autorizado</p>
 
       </div>
     </div>
