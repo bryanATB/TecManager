@@ -12,42 +12,41 @@ const ACCIONES = {
 };
 
 export default function HistorialPage() {
-  const { tareaId } = useParams();
-  const navigate    = useNavigate();
+  const { ticketId } = useParams();
+  const navigate     = useNavigate();
 
   const [historial,    setHistorial]    = useState([]);
   const [reportes,     setReportes]     = useState([]);
-  const [tarea,        setTarea]        = useState(null);
+  const [ticket,       setTicket]       = useState(null);
   const [cargando,     setCargando]     = useState(true);
   const [error,        setError]        = useState('');
   const [vistaActiva,  setVistaActiva]  = useState('historial');
 
-  useEffect(() => { cargarDatos(); }, [tareaId]);
+  useEffect(() => { cargarDatos(); }, [ticketId]);
 
   const cargarDatos = async () => {
     try {
       setCargando(true);
 
-      const tareaRes = await api.get(`/tareas/${tareaId}`);
-      setTarea(tareaRes.data);
+      const ticketRes = await api.get(`/tareas/${ticketId}`);
+      setTicket(ticketRes.data);
 
     try {
-      const historialRes = await api.get(`/historial/tarea/${tareaId}`);
+      const historialRes = await api.get(`/historial/tarea/${ticketId}`);
       setHistorial(historialRes.data || []);
     } catch {
       setHistorial([]);
     }
 
-    // Reportes — opcional, puede estar vacío
     try {
-      const reportesRes = await api.get(`/reportes/tarea/${tareaId}`);
+      const reportesRes = await api.get(`/reportes/tarea/${ticketId}`);
       setReportes(reportesRes.data || []);
     } catch {
       setReportes([]);
     }
 
   } catch {
-    setError('Error al cargar los datos de la tarea');
+    setError('Error al cargar los datos del ticket');
   } finally {
     setCargando(false);
   }
@@ -64,31 +63,29 @@ export default function HistorialPage() {
   return (
     <div className="contenedor">
 
-      {/* Header */}
       <div className="page-header">
         <div>
-          <button className="dash-refresh-btn" style={{ marginBottom:10 }} onClick={() => navigate('/tareas')}>
-            <ArrowLeft size={13} strokeWidth={2.5} /> Volver a Tareas
+          <button className="dash-refresh-btn" style={{ marginBottom:10 }} onClick={() => navigate('/tickets')}>
+            <ArrowLeft size={13} strokeWidth={2.5} /> Volver a Tickets
           </button>
           <p className="dash-eyebrow">Trazabilidad</p>
-          <h1>Historial de tarea</h1>
-          {tarea && <p className="texto-suave" style={{ marginTop:3 }}>{tarea.titulo}</p>}
+          <h1>Historial de ticket</h1>
+          {ticket && <p className="texto-suave" style={{ marginTop:3 }}>{ticket.titulo}</p>}
         </div>
       </div>
 
       {error && <div className="alerta alerta-error">{error}</div>}
 
-      {/* Info tarea */}
-      {tarea && (
+      {ticket && (
         <div className="card hist-info-card">
           <div className="tarea-info-grid">
             {[
-              { label: 'Estado',    val: <span className={`badge badge-${tarea.estado?.toLowerCase().replace('_','-')}`}>{tarea.estado?.replace('_',' ')}</span> },
-              { label: 'Prioridad', val: <span className={`badge badge-${tarea.prioridad?.toLowerCase()}`}>{tarea.prioridad}</span> },
-              { label: 'Técnico',   val: tarea.tecnicoNombre || '—' },
-              { label: 'Est. (h)',  val: tarea.tiempoEstimadoHoras ? `${tarea.tiempoEstimadoHoras}h` : '—' },
-              { label: 'Real (h)',  val: tarea.tiempoRealHoras != null ? `${tarea.tiempoRealHoras}h` : '—' },
-              { label: 'Límite',   val: fmt(tarea.fechaLimite) },
+              { label: 'Estado',    val: <span className={`badge badge-${ticket.estado?.toLowerCase().replace('_','-')}`}>{ticket.estado?.replace('_',' ')}</span> },
+              { label: 'Prioridad', val: <span className={`badge badge-${ticket.prioridad?.toLowerCase()}`}>{ticket.prioridad}</span> },
+              { label: 'Técnico',   val: ticket.tecnicoNombre || '—' },
+              { label: 'Est. (h)',  val: ticket.tiempoEstimadoHoras ? `${ticket.tiempoEstimadoHoras}h` : '—' },
+              { label: 'Real (h)',  val: ticket.tiempoRealHoras != null ? `${ticket.tiempoRealHoras}h` : '—' },
+              { label: 'Límite',    val: fmt(ticket.fechaLimite) },
             ].map(({ label, val }) => (
               <div className="tarea-info-item" key={label}>
                 <span className="tarea-info-label">{label}</span>
@@ -99,7 +96,6 @@ export default function HistorialPage() {
         </div>
       )}
 
-      {/* Tabs */}
       <div className="hist-tabs">
         {[
           { key:'historial', label:'Historial de cambios', count: historial.length },
@@ -115,7 +111,6 @@ export default function HistorialPage() {
         ))}
       </div>
 
-      {/* Timeline historial */}
       {vistaActiva === 'historial' && (
         <div className="timeline">
           {!historial.length
@@ -148,11 +143,10 @@ export default function HistorialPage() {
         </div>
       )}
 
-      {/* Reportes */}
       {vistaActiva === 'reportes' && (
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           {!reportes.length
-            ? <div className="vacio">No hay reportes para esta tarea</div>
+            ? <div className="vacio">No hay reportes para este ticket</div>
             : reportes.map((rep, i) => (
                 <div key={rep.id || i} className="card reporte-card">
                   <div className="reporte-header">

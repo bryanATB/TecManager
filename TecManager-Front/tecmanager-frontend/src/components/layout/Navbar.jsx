@@ -6,20 +6,21 @@ import {
   Users, CheckSquare, LogOut, Menu, X, Tag,
 } from 'lucide-react';
 import NotificacionBadge from './NotificacionBadge';
+import BottomMobile from './BottomMobile.jsx';
 import TopBar from './Topbar';
 import '../../styles/navbar.css';
 
-// Map route → readable page title
 const TITULOS = {
-  '/dashboard':  'Dashboard',
-  '/tareas':     'Tareas',
-  '/usuarios':   'Usuarios',
-  '/categorias': 'Categorías',
-  '/mis-tareas': 'Mis Tareas',
+  '/dashboard':      'Dashboard',
+  '/tickets':        'Tickets',
+  '/usuarios':       'Usuarios',
+  '/categorias':     'Categorías',
+  '/especialidades': 'Especialidades',
+  '/mis-tickets':    'Mis Tickets',
 };
 
 export default function Navbar() {
-  const { usuario, logout, esAdmin, esAsignador, esTecnico } = useAuth();
+  const { usuario, logout, esAdmin, esSupervisor, esTecnico } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -43,7 +44,7 @@ export default function Navbar() {
 
         {/* Nav icons */}
         <nav className="sidebar-nav">
-          {(esAdmin() || esAsignador()) && (
+          {(esAdmin() || esSupervisor()) && (
             <>
               <NavLink
                 to="/dashboard"
@@ -56,9 +57,9 @@ export default function Navbar() {
                 </span>
               </NavLink>
               <NavLink
-                to="/tareas"
+                to="/tickets"
                 className="sidebar-link"
-                data-label="Tareas"
+                data-label="Tickets"
                 onClick={() => setMenuAbierto(false)}
               >
                 <span className="sidebar-link-icon">
@@ -90,14 +91,24 @@ export default function Navbar() {
                   <Tag size={17} strokeWidth={1.9} />
                 </span>
               </NavLink>
+              <NavLink
+                to="/especialidades"
+                className="sidebar-link"
+                data-label="Especialidades"
+                onClick={() => setMenuAbierto(false)}
+              >
+                <span className="sidebar-link-icon">
+                  <Wrench size={17} strokeWidth={1.9} />
+                </span>
+              </NavLink>
             </>
           )}
 
           {esTecnico() && (
             <NavLink
-              to="/mis-tareas"
+              to="/mis-tickets"
               className="sidebar-link"
-              data-label="Mis Tareas"
+              data-label="Mis Tickets"
               onClick={() => setMenuAbierto(false)}
             >
               <span className="sidebar-link-icon">
@@ -117,11 +128,6 @@ export default function Navbar() {
 
       </aside>
 
-      {/* ── MOBILE TOGGLE ── */}
-      <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>
-        {menuAbierto ? <X size={17} /> : <Menu size={17} />}
-      </button>
-
       {/* ── MAIN COLUMN ── */}
       <div className="main-contenido-wrapper">
         <TopBar titulo={paginaActual} />
@@ -129,6 +135,7 @@ export default function Navbar() {
           <Outlet />
         </main>
       </div>
+      <BottomMobile />
 
     </div>
   );

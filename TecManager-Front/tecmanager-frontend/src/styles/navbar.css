@@ -181,7 +181,7 @@ html, body { height: 100%; overflow: hidden; }
   letter-spacing: 0.05em; text-transform: uppercase;
 }
 .badge-admin     { background: #ede4f5; color: #6b3fa0; }
-.badge-asignador { background: #daf0f5; color: #1a7a8a; }
+.badge-supervisor { background: #daf0f5; color: #1a7a8a; }
 .badge-tecnico   { background: #daf5e8; color: #1a7a4a; }
 
 .menu-toggle {
@@ -194,6 +194,9 @@ html, body { height: 100%; overflow: hidden; }
 }
 
 @media (max-width: 768px) {
+  .main-contenido {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
   .sidebar {
     position: fixed; left: 0; top: 0;
     height: 100vh; transform: translateX(-100%); z-index: 100;
